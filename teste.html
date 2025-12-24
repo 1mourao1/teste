@@ -1,0 +1,557 @@
+
+<html lang="pt-br">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+    <title>Sistema Multi-Métodos</title>
+    <style>
+        :root {
+            --bg-color: #121212;
+            --card-bg: #1e1e1e;
+            --text-color: #f5f5f5;
+            --accent-color: #00e676; /* Verde Neon */
+            --input-bg: #2d2d2d;
+            --border-radius: 12px;
+        }
+
+        * { box-sizing: border-box; -webkit-tap-highlight-color: transparent; }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
+            background-color: var(--bg-color);
+            color: var(--text-color);
+            margin: 0;
+            padding: 15px;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+
+        .container { width: 100%; max-width: 600px; padding-bottom: 80px; }
+
+        header {
+            text-align: center;
+            margin-bottom: 20px;
+            padding: 10px;
+            border-bottom: 1px solid #333;
+        }
+
+        h1 {
+            color: var(--accent-color);
+            font-size: 1.5rem;
+            margin: 0 0 10px 0;
+            text-transform: uppercase;
+            letter-spacing: 1px;
+        }
+
+        /* Estilo do Select */
+        .method-selector {
+            width: 100%;
+            padding: 12px;
+            background-color: var(--input-bg);
+            color: #fff;
+            border: 1px solid var(--accent-color);
+            border-radius: 8px;
+            font-size: 1rem;
+            font-weight: bold;
+            outline: none;
+            margin-bottom: 15px;
+            text-transform: uppercase;
+        }
+
+        .card {
+            background-color: var(--card-bg);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.3);
+        }
+
+        label {
+            display: flex;
+            justify-content: space-between;
+            margin-bottom: 10px;
+            font-size: 0.9rem;
+            color: #aaa;
+            text-transform: uppercase;
+            font-weight: bold;
+        }
+
+        .row-badge {
+            background: #333;
+            padding: 2px 8px;
+            border-radius: 4px;
+            color: var(--accent-color);
+            font-size: 0.8rem;
+        }
+
+        .number-row {
+            display: grid;
+            grid-template-columns: repeat(6, 1fr);
+            gap: 8px;
+        }
+
+        @media (max-width: 500px) {
+            .number-row { grid-template-columns: repeat(3, 1fr); }
+        }
+
+        input[type="number"] {
+            width: 100%;
+            height: 50px;
+            background-color: var(--input-bg);
+            border: 1px solid #444;
+            color: white;
+            border-radius: 8px;
+            text-align: center;
+            font-size: 1.3rem;
+            font-weight: bold;
+            outline: none;
+            transition: border 0.2s, background 0.2s;
+        }
+
+        input[type="number"]:focus {
+            border-color: var(--accent-color);
+            background-color: #383838;
+        }
+        
+        input::-webkit-outer-spin-button, input::-webkit-inner-spin-button { -webkit-appearance: none; margin: 0; }
+
+        .btn-group {
+            display: grid;
+            grid-template-columns: 1fr 1fr;
+            gap: 10px;
+            margin-top: 10px;
+        }
+
+        button {
+            padding: 16px;
+            border: none;
+            border-radius: var(--border-radius);
+            font-size: 1rem;
+            font-weight: bold;
+            text-transform: uppercase;
+            cursor: pointer;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.2);
+        }
+
+        .btn-calc { background-color: var(--accent-color); color: #000; grid-column: span 2; }
+        .btn-calc:active { transform: scale(0.98); }
+        .btn-clear { background-color: #333; color: #ccc; grid-column: span 2; }
+
+        .result-area {
+            background-color: #1a1a1a;
+            border: 1px solid var(--accent-color);
+            border-radius: var(--border-radius);
+            padding: 20px;
+            margin-top: 20px;
+            text-align: center;
+            display: none;
+            animation: slideUp 0.3s ease-out;
+        }
+
+        @keyframes slideUp {
+            from { opacity: 0; transform: translateY(20px); }
+            to { opacity: 1; transform: translateY(0); }
+        }
+
+        .final-numbers {
+            display: flex;
+            justify-content: center;
+            flex-wrap: wrap;
+            gap: 10px;
+            margin: 15px 0;
+        }
+
+        .ball {
+            width: 45px;
+            height: 45px;
+            background: linear-gradient(135deg, var(--accent-color), #00b359);
+            color: #000;
+            border-radius: 50%;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            font-weight: 800;
+            font-size: 1.2rem;
+            box-shadow: 0 2px 5px rgba(0,0,0,0.5);
+        }
+
+        .log-container {
+            margin-top: 15px;
+            background: #111;
+            border-radius: 8px;
+            padding: 10px;
+            text-align: left;
+            max-height: 250px;
+            overflow-y: auto;
+            border: 1px solid #333;
+        }
+
+        .log-entry {
+            font-family: monospace;
+            font-size: 0.85rem;
+            color: #888;
+            padding: 6px 0;
+            border-bottom: 1px solid #222;
+        }
+        .log-entry:last-child { border-bottom: none; }
+        .highlight { color: var(--accent-color); font-weight: bold; }
+        .method-title { color: #fff; margin-bottom: 5px; font-size: 0.9rem; text-decoration: underline; }
+
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <header>
+            <h1>Loteria System</h1>
+            <select id="methodSelect" class="method-selector">
+                <option value="m01">Método 01</option>
+                <option value="m02">Método 02</option>
+                <option value="m03">Método 03</option>
+                <option value="m04">Método 04</option>
+                <option value="m06">Método 06</option>
+                <option value="m07">Método 07</option>
+                <option value="m08">Método 08</option>
+            </select>
+        </header>
+
+        <div class="card">
+            <label>Linha A (Topo) <span class="row-badge">A</span></label>
+            <div class="number-row" id="rowA">
+                <input type="number" inputmode="numeric"><input type="number" inputmode="numeric"><input type="number" inputmode="numeric">
+                <input type="number" inputmode="numeric"><input type="number" inputmode="numeric"><input type="number" inputmode="numeric">
+            </div>
+        </div>
+
+        <div class="card">
+            <label>Linha B (Baixo) <span class="row-badge">B</span></label>
+            <div class="number-row" id="rowB">
+                <input type="number" inputmode="numeric"><input type="number" inputmode="numeric"><input type="number" inputmode="numeric">
+                <input type="number" inputmode="numeric"><input type="number" inputmode="numeric"><input type="number" inputmode="numeric">
+            </div>
+        </div>
+
+        <div class="btn-group">
+            <button class="btn-calc" onclick="calcular()">PROCESSAR CÁLCULOS</button>
+            <button class="btn-clear" onclick="limpar()">LIMPAR CAMPOS</button>
+        </div>
+
+        <div id="resultBox" class="result-area">
+            <h3 style="margin:0; color:#fff; font-weight:300;">NÚMEROS GERADOS</h3>
+            <div class="final-numbers" id="outputBalls"></div>
+            
+            <details>
+                <summary style="color:#666; cursor:pointer; outline:none; padding:10px;">Verificar Cálculos</summary>
+                <div class="log-container" id="calcLog"></div>
+            </details>
+        </div>
+    </div>
+
+    <script>
+        // Função auxiliar para calcular e logar
+        // abs = true força o resultado a ser positivo (Math.abs)
+        function calcBlock(formulaStr, resultVal, logsArray) {
+            // Formata se for menor que 10
+            let displayVal = resultVal < 10 ? '0' + resultVal : resultVal;
+            logsArray.push(`<div class="log-entry">${formulaStr} = <span class="highlight">${displayVal}</span></div>`);
+            return resultVal;
+        }
+
+        // Função que aplica ajuste (+1 ou -1) e retorna valor absoluto
+        function safeCalc(raw, adjustment) {
+            let val = raw + adjustment;
+            return Math.abs(val);
+        }
+        
+        // Se o resultado for 0, geralmente vira 1 nas lógicas de loteria ou mantém 0?
+        // Baseado no Método 06 "0 (+1) 1", 0 vira 1.
+        function fixZero(val) {
+            return val === 0 ? 1 : val;
+        }
+
+        function calcular() {
+            const inputsA = document.querySelectorAll('#rowA input');
+            const inputsB = document.querySelectorAll('#rowB input');
+            const method = document.getElementById('methodSelect').value;
+            
+            let A = [];
+            let B = [];
+            
+            inputsA.forEach(inp => A.push(parseInt(inp.value) || 0));
+            inputsB.forEach(inp => B.push(parseInt(inp.value) || 0));
+
+            const sum = A.reduce((a,b)=>a+b,0) + B.reduce((a,b)=>a+b,0);
+            if(sum === 0) { alert("Preencha os números!"); return; }
+
+            let results = [];
+            let logs = [];
+
+            // ---------------- LÓGICA DOS MÉTODOS ----------------
+
+            if (method === 'm01') {
+                // (Mantendo lógica anterior do M01)
+                logs.push('<div class="method-title">Cálculo Método 01</div>');
+                let v1 = safeCalc((A[5] - B[5]) + A[4], 1);
+                results.push(calcBlock(`${A[5]}-${B[5]}+${A[4]} (+1)`, v1, logs));
+                
+                let v2 = safeCalc((B[3] - B[2]) + A[3], 1);
+                results.push(calcBlock(`${B[3]}-${B[2]}+${A[3]} (+1)`, v2, logs));
+                
+                let v3 = safeCalc((B[2] - B[3]) + A[3], 0);
+                results.push(calcBlock(`${B[2]}-${B[3]}+${A[3]}`, v3, logs));
+                
+                let v4 = safeCalc((A[2] - B[1]) + A[1], 1);
+                results.push(calcBlock(`${A[2]}-${B[1]}+${A[1]} (+1)`, v4, logs));
+                
+                let v5 = safeCalc((A[2] - B[2]) + A[1], 0);
+                results.push(calcBlock(`${A[2]}-${B[2]}+${A[1]}`, v5, logs));
+                
+                let v6 = safeCalc((B[1] - A[1]) + B[0], -1);
+                results.push(calcBlock(`${B[1]}-${A[1]}+${B[0]} (-1)`, v6, logs));
+            }
+
+            else if (method === 'm02') {
+                // (Lógica M02 revisada do turno anterior)
+                logs.push('<div class="method-title">Cálculo Método 02</div>');
+                let v1 = safeCalc((A[5] - B[5]) + A[3] - A[4], 0);
+                results.push(calcBlock(`(${A[5]}-${B[5]})+${A[3]}-${A[4]}`, v1, logs));
+
+                let v2 = safeCalc((A[4] - A[3]) + (A[5] - B[5]), 1);
+                results.push(calcBlock(`(${A[4]}-${A[3]})+(${A[5]}-${B[5]}) (+1)`, v2, logs));
+
+                let v3 = safeCalc((A[3] - B[4]) + B[3], -1);
+                results.push(calcBlock(`${A[3]}-${B[4]}+${B[3]} (-1)`, v3, logs));
+
+                let v3b = safeCalc((B[4] - A[3]) + B[3], -1);
+                results.push(calcBlock(`${B[4]}-${A[3]}+${B[3]} (-1)`, v3b, logs));
+
+                let v4 = safeCalc(A[3] + B[3] - A[2], 0);
+                results.push(calcBlock(`${A[3]}+${B[3]}-${A[2]}`, v4, logs));
+
+                let v5 = safeCalc(B[3] + B[2] - A[2], 1);
+                results.push(calcBlock(`${B[3]}+${B[2]}-${A[2]} (+1)`, v5, logs));
+
+                let v6 = safeCalc(A[2] - A[1] + B[2], 0);
+                results.push(calcBlock(`${A[2]}-${A[1]}+${B[2]}`, v6, logs));
+                results.push(calcBlock(`Variação de ${v6} (+1)`, v6+1, logs)); // Par do 30->31
+
+                let v7 = safeCalc((B[1] - B[0]) + A[1] + A[0], -1);
+                results.push(calcBlock(`(${B[1]}-${B[0]})+${A[1]}+${A[0]} (-1)`, v7, logs));
+                
+                let v8 = safeCalc(A[0] + A[1] - B[1], -1);
+                // Correção específica para 0->1
+                if(v8 === 0) v8 = 1;
+                results.push(calcBlock(`${A[0]}+${A[1]}-${B[1]} (-1)`, v8, logs));
+            }
+
+            else if (method === 'm03') {
+                logs.push('<div class="method-title">Cálculo Método 03</div>');
+                // 58-42+44 = 60
+                let v1 = safeCalc(B[5] - A[4] + A[5], 0);
+                results.push(calcBlock(`${B[5]}-${A[4]}+${A[5]}`, v1, logs));
+
+                // 58-51+44 = 51 (-1) 50
+                let v2 = safeCalc(B[5] - B[4] + A[5], -1);
+                results.push(calcBlock(`${B[5]}-${B[4]}+${A[5]} (-1)`, v2, logs));
+
+                // 42-44+51 = 49 (-1) 48
+                let v3 = safeCalc(A[4] - A[5] + B[4], -1);
+                results.push(calcBlock(`${A[4]}-${A[5]}+${B[4]} (-1)`, v3, logs));
+
+                // 42-51+25 = 16 (-1) 15
+                let v4 = safeCalc(A[4] - B[4] + B[3], -1);
+                results.push(calcBlock(`${A[4]}-${B[4]}+${B[3]} (-1)`, v4, logs));
+
+                // 39-37+24 = 26
+                let v5 = safeCalc(A[3] - A[2] + B[2], 0);
+                results.push(calcBlock(`${A[3]}-${A[2]}+${B[2]}`, v5, logs));
+
+                // 39-25+37 = 51
+                let v6 = safeCalc(A[3] - B[3] + A[2], 0);
+                results.push(calcBlock(`${A[3]}-${B[3]}+${A[2]}`, v6, logs));
+
+                // 37-24+8 = 21
+                let v7 = safeCalc(A[2] - B[2] + B[1], 0);
+                results.push(calcBlock(`${A[2]}-${B[2]}+${B[1]}`, v7, logs));
+
+                // 9-8+1 = 2 (-1) 1
+                let v8 = safeCalc(A[1] - B[1] + A[0], -1);
+                results.push(calcBlock(`${A[1]}-${B[1]}+${A[0]} (-1)`, v8, logs));
+            }
+
+            else if (method === 'm04') {
+                logs.push('<div class="method-title">Cálculo Método 04</div>');
+                // 44-42+51 = 53 (-1) 52
+                results.push(calcBlock(`${A[5]}-${A[4]}+${B[4]} (-1)`, safeCalc(A[5] - A[4] + B[4], -1), logs));
+                
+                // 58-44+42 = 56 (+1) 57
+                results.push(calcBlock(`${B[5]}-${A[5]}+${A[4]} (+1)`, safeCalc(B[5] - A[5] + A[4], 1), logs));
+
+                // 42-39+51 = 54
+                results.push(calcBlock(`${A[4]}-${A[3]}+${B[4]}`, safeCalc(A[4] - A[3] + B[4], 0), logs));
+
+                // 39-51+42-25 = 5 (+1) 6
+                results.push(calcBlock(`${A[3]}-${B[4]}+${A[4]}-${B[3]} (+1)`, safeCalc(A[3] - B[4] + A[4] - B[3], 1), logs));
+
+                // 25-42+51 = 34
+                results.push(calcBlock(`${B[3]}-${A[4]}+${B[4]}`, safeCalc(B[3] - A[4] + B[4], 0), logs));
+
+                // 25+37-39 = 23
+                results.push(calcBlock(`${B[3]}+${A[2]}-${A[3]}`, safeCalc(B[3] + A[2] - A[3], 0), logs));
+
+                // 37-25+24 = 36 (+1) 37
+                results.push(calcBlock(`${A[2]}-${B[3]}+${B[2]} (+1)`, safeCalc(A[2] - B[3] + B[2], 1), logs));
+
+                // 25-37+24 = 12 (-1) 11
+                results.push(calcBlock(`${B[3]}-${A[2]}+${B[2]} (-1)`, safeCalc(B[3] - A[2] + B[2], -1), logs));
+
+                // 24-9+37+8 = 60 (-1) 59
+                results.push(calcBlock(`${B[2]}-${A[1]}+${A[2]}+${B[1]} (-1)`, safeCalc(B[2] - A[1] + A[2] + B[1], -1), logs));
+
+                // 37-24+8 = 21
+                results.push(calcBlock(`${A[2]}-${B[2]}+${B[1]}`, safeCalc(A[2] - B[2] + B[1], 0), logs));
+
+                // 37-9+8 = 36 (-1) 35
+                results.push(calcBlock(`${A[2]}-${A[1]}+${B[1]} (-1)`, safeCalc(A[2] - A[1] + B[1], -1), logs));
+
+                // 9+8-5 = 12 (+1) 13
+                results.push(calcBlock(`${A[1]}+${B[1]}-${B[0]} (+1)`, safeCalc(A[1] + B[1] - B[0], 1), logs));
+
+                // 9+5-1-8 = 5 (+1) 6
+                results.push(calcBlock(`${A[1]}+${B[0]}-${A[0]}-${B[1]} (+1)`, safeCalc(A[1] + B[0] - A[0] - B[1], 1), logs));
+            }
+
+            else if (method === 'm06') {
+                logs.push('<div class="method-title">Cálculo Método 06</div>');
+                // 58-44+42 = 56 (+1) 57
+                results.push(calcBlock(`${B[5]}-${A[5]}+${A[4]} (+1)`, safeCalc(B[5] - A[5] + A[4], 1), logs));
+                
+                // 58-44+51 = 65 (-1) 64
+                results.push(calcBlock(`${B[5]}-${A[5]}+${B[4]} (-1)`, safeCalc(B[5] - A[5] + B[4], -1), logs));
+
+                // 37-39+25 = 23 (+1) 24
+                results.push(calcBlock(`${A[2]}-${A[3]}+${B[3]} (+1)`, safeCalc(A[2] - A[3] + B[3], 1), logs));
+
+                // 24-37+25 = 12 (+1) 13
+                results.push(calcBlock(`${B[2]}-${A[2]}+${B[3]} (+1)`, safeCalc(B[2] - A[2] + B[3], 1), logs));
+
+                // 37-24+9 = 22 (+1) 23
+                results.push(calcBlock(`${A[2]}-${B[2]}+${A[1]} (+1)`, safeCalc(A[2] - B[2] + A[1], 1), logs));
+
+                // 8-24+37 = 21 (-1) 20
+                results.push(calcBlock(`${B[1]}-${B[2]}+${A[2]} (-1)`, safeCalc(B[1] - B[2] + A[2], -1), logs));
+
+                // 8-37+24 = -5 -> 5
+                // Tratamento especial: O usuário diz que resultado é -5. Isso implica Abs(-5) = 5.
+                results.push(calcBlock(`${B[1]}-${A[2]}+${B[2]}`, Math.abs(B[1] - A[2] + B[2]), logs));
+
+                // 24-37+8+9 = 4
+                results.push(calcBlock(`${B[2]}-${A[2]}+${B[1]}+${A[1]}`, safeCalc(B[2] - A[2] + B[1] + A[1], 0), logs));
+
+                // 9-1+5 = 13
+                results.push(calcBlock(`${A[1]}-${A[0]}+${B[0]}`, safeCalc(A[1] - A[0] + B[0], 0), logs));
+
+                // 8-9+1 = 0 (+1) 1
+                let z1 = safeCalc(B[1] - A[1] + A[0], 1);
+                results.push(calcBlock(`${B[1]}-${A[1]}+${A[0]} (+1)`, fixZero(z1), logs));
+
+                // 8-5+1 = 4 (+1) 5
+                results.push(calcBlock(`${B[1]}-${B[0]}+${A[0]} (+1)`, safeCalc(B[1] - B[0] + A[0], 1), logs));
+            }
+
+            else if (method === 'm07') {
+                logs.push('<div class="method-title">Cálculo Método 07</div>');
+                // 58-44+42-51 = 5 (-1) 4
+                results.push(calcBlock(`${B[5]}-${A[5]}+${A[4]}-${B[4]} (-1)`, safeCalc(B[5] - A[5] + A[4] - B[4], -1), logs));
+
+                // 42-51+39 = 30
+                results.push(calcBlock(`${A[4]}-${B[4]}+${A[3]}`, safeCalc(A[4] - B[4] + A[3], 0), logs));
+
+                // 25-42+39 = 22
+                results.push(calcBlock(`${B[3]}-${A[4]}+${A[3]}`, safeCalc(B[3] - A[4] + A[3], 0), logs));
+
+                // 39-25+37-24 = 27 (+1) 28
+                results.push(calcBlock(`${A[3]}-${B[3]}+${A[2]}-${B[2]} (+1)`, safeCalc(A[3] - B[3] + A[2] - B[2], 1), logs));
+
+                // 25-37+24-39 = -27 (-1) 28
+                // Lógica: (-27 - 1) = -28 -> Abs = 28
+                results.push(calcBlock(`${B[3]}-${A[2]}+${B[2]}-${A[3]} (-1)`, safeCalc(B[3] - A[2] + B[2] - A[3], -1), logs));
+
+                // 25-39+24 = 10
+                results.push(calcBlock(`${B[3]}-${A[3]}+${B[2]}`, safeCalc(B[3] - A[3] + B[2], 0), logs));
+
+                // 24-37+9-8 = -12 -> 12
+                results.push(calcBlock(`${B[2]}-${A[2]}+${A[1]}-${B[1]}`, Math.abs(B[2] - A[2] + A[1] - B[1]), logs));
+
+                // 37-24+9 = 22 (-1) 21
+                results.push(calcBlock(`${A[2]}-${B[2]}+${A[1]} (-1)`, safeCalc(A[2] - B[2] + A[1], -1), logs));
+
+                // 1-9+5 = -4 -> 4 (Simplesmente valor absoluto no método 07 para esse bloco?)
+                // O exemplo diz -4, e o resultado final tem 04.
+                results.push(calcBlock(`${A[0]}-${A[1]}+${B[0]}`, Math.abs(A[0] - A[1] + B[0]), logs));
+
+                // 9+8-5 = 12 (-1) 11
+                results.push(calcBlock(`${A[1]}+${B[1]}-${B[0]} (-1)`, safeCalc(A[1] + B[1] - B[0], -1), logs));
+                
+                // 9+8-1 = 16 (-1) 15
+                results.push(calcBlock(`${A[1]}+${B[1]}-${A[0]} (-1)`, safeCalc(A[1] + B[1] - A[0], -1), logs));
+
+                // 5-8+9 = 6 (-1) 5
+                results.push(calcBlock(`${B[0]}-${B[1]}+${A[1]} (-1)`, safeCalc(B[0] - B[1] + A[1], -1), logs));
+
+                // 1-8+9 = 2 (-1) 1
+                results.push(calcBlock(`${A[0]}-${B[1]}+${A[1]} (-1)`, safeCalc(A[0] - B[1] + A[1], -1), logs));
+            }
+
+            else if (method === 'm08') {
+                logs.push('<div class="method-title">Cálculo Método 08</div>');
+                // 44-42+51 = 53
+                results.push(calcBlock(`${A[5]}-${A[4]}+${B[4]}`, safeCalc(A[5] - A[4] + B[4], 0), logs));
+                
+                // 42-44+58 = 56 (-1) 55
+                results.push(calcBlock(`${A[4]}-${A[5]}+${B[5]} (-1)`, safeCalc(A[4] - A[5] + B[5], -1), logs));
+
+                // 42-39+51 = 54
+                results.push(calcBlock(`${A[4]}-${A[3]}+${B[4]}`, safeCalc(A[4] - A[3] + B[4], 0), logs));
+
+                // 25-24+37 = 38 (-1) 37
+                results.push(calcBlock(`${B[3]}-${B[2]}+${A[2]} (-1)`, safeCalc(B[3] - B[2] + A[2], -1), logs));
+
+                // 24-37+8 = -5 (+1) 04
+                results.push(calcBlock(`${B[2]}-${A[2]}+${B[1]} (+1)`, safeCalc(B[2] - A[2] + B[1], 1), logs));
+
+                // 5-8+1 = -2 (+1) 1
+                results.push(calcBlock(`${B[0]}-${B[1]}+${A[0]} (+1)`, safeCalc(B[0] - B[1] + A[0], 1), logs));
+            }
+
+            // Exibição Final
+            let unique = [...new Set(results)].filter(n => n > 0);
+            unique.sort((a,b)=>a-b);
+            
+            const outputDiv = document.getElementById('outputBalls');
+            const logDiv = document.getElementById('calcLog');
+            const resultBox = document.getElementById('resultBox');
+
+            outputDiv.innerHTML = "";
+            logDiv.innerHTML = logs.join("");
+
+            unique.forEach(num => {
+                const ball = document.createElement('div');
+                ball.className = 'ball';
+                ball.innerText = num < 10 ? '0' + num : num;
+                outputDiv.appendChild(ball);
+            });
+
+            resultBox.style.display = 'block';
+            resultBox.scrollIntoView({ behavior: 'smooth', block: 'nearest' });
+        }
+
+        function limpar() {
+            document.querySelectorAll('input').forEach(i => i.value = '');
+            document.getElementById('resultBox').style.display = 'none';
+        }
+    </script>
+</body>
+</html>
